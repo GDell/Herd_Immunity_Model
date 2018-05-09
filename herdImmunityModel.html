@@ -1,0 +1,381 @@
+ 
+<!DOCTYPE html>
+<style type="text/css">
+  .square {
+  display: inline-block;
+
+}
+
+#gridHolder {
+  margin-left:20%;
+    /*background-color: white;*/
+    /*overflow:auto;*/
+    /*height: auto;*/
+}
+
+
+.row{
+  height:10px;
+}
+
+.innerSquare {
+   top: calc(50% - 20px); left(50% - 20px);
+   border-width: 1px;
+   border-color: black;
+   border-style: solid;
+}
+
+.vaccinated {
+  background-color: #d580ff;
+}
+
+.unvaccinated {
+  background-color: #99ccff;
+}
+
+.infected {
+  background-color: #ff3300;
+}
+</style>
+ 
+
+<html>
+  <head>
+    <!-- <script src="jsPsych/jspsych.js"></script> -->
+    <!-- <script src="jsPsych/plugins/jspsych-single-stim.js"></script> -->
+    <link rel="stylesheet" href="immunityStyle.css"></link>
+  </head>
+  <body >
+    <h1 style="margin-left: 30%">Herd Immunity Model</h1>
+    
+      <div style="margin-left: 30%; float: left;" id="gridHolder">
+        
+      </div>
+      <div style="float: right; margin-right: 20%">
+        <h4><b>Legend</b></h4>
+        <div class="vaccinated" style="height: 10px; width: 10px; margin-bottom: 8px"><p style="padding-left: 20px">Vaccinated</p></div>
+        <div class="unvaccinated" style="height: 10px; width: 10px;margin-bottom: 8px"><p style="padding-left: 20px"> Unvaccinated </p></div>
+        <div class="infected" style="height: 10px; width: 10px;margin-bottom: 8px"><p style="padding-left: 20px">Infected</p></div>
+      </div>
+      <div style="float: right; margin-right: 15%">
+        <h5>Starting Infection Rate:</h5>
+        <p id="displayStartingInfectionRatio"></p>
+        <h5>Percent Vaccinated:</h5>
+        <p id="displayVaccinationRatio"></p>
+        <h5>Total percent Infected:</h5>
+        <p id="displayInfectedRatio"></p>
+      </div>
+
+    </div>
+    
+  </body>
+  <!-- <script src="p5/p5.js"></script> -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.1/p5.min.js"></script>
+  <!-- <script type="text/javascript" src="test.js"></script> -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.9.0/underscore-min.js"></script>
+
+
+</html>
+
+
+<script type="text/javascript">
+  
+// Grid variable declarations
+var sizeSide = 50; 
+var gridSize = sizeSide*sizeSide;
+
+var reference2Darray = []
+
+var percentImmunity;
+var numberImmune;
+var percentInfected;
+var startingNumberSick;
+
+
+var numberUnvaccinated;
+
+var chanceCatch;
+var infectedLog = [];
+var immuneLog = [];
+var unvaccinatedLog = [] 
+
+
+
+function startingSickIndividuals() {
+    var arr = []
+    while(arr.length < startingNumberSick){
+        var randomnumber = Math.floor(Math.random()*gridSize) + 1;
+        // console.log('rand numb: '+ randomnumber)
+        if(arr.includes(randomnumber)) continue;
+        if(immuneLog.includes(randomnumber)) continue;
+        arr[arr.length] = randomnumber;
+    }
+
+    return(arr)
+
+}
+
+
+function determineImmuneIndividuals() {
+
+    var arr = []
+    while(arr.length < numberImmune){
+        var randomnumber = Math.floor(Math.random()*gridSize) + 1;
+        // console.log('rand numb: '+ randomnumber)
+        if(arr.includes(randomnumber)) continue;
+        if(infectedLog.includes(randomnumber)) continue;
+        if(unvaccinatedLog.includes(randomnumber)) continue;
+        arr[arr.length] = randomnumber;
+    }
+
+    return(arr)
+
+}
+
+function determineUnvaccinatedIndividuals() {
+
+    var arr = []
+    while(arr.length < numberUnvaccinated){
+        var randomnumber = Math.floor(Math.random()*gridSize) + 1;
+        // console.log('rand numb: '+ randomnumber)
+        if(arr.includes(randomnumber)) continue;
+        if(infectedLog.includes(randomnumber)) continue;
+        if(immuneLog.includes(randomnumber)) continue;
+        arr[arr.length] = randomnumber;
+    }
+
+    return(arr)
+
+}
+
+
+
+function classifyHealth(index, sickList, immuneList, unvaccinatedList) {
+  var result = sickList.includes(index);
+  var isImmune = immuneList.includes(index);
+  var isUnvaccinated = unvaccinatedList.includes(index)
+
+  var type; 
+  if(result) {
+    // Sickly Green
+    type = "infected"
+  } else if (isUnvaccinated){
+    // Healthy blue
+    type = "unvaccinated"
+  } else if(isImmune) {
+
+    type = "vaccinated"
+  }
+
+  
+
+  return(type)
+
+}
+
+
+
+  // FUNCTION: generateScene
+  // INPUT: array, imageSRC, sceneName
+  // OUTPUT: A scene with an image in all of the img id's specified in the 
+// input array.
+function generateScene(referenceArray, infectedIndex, immuneIndex, unvaccinatedIndex) {
+  var html = '';
+
+  var count = 1;
+
+  for(var i =0; i < sizeSide; i++) { 
+
+    html += '<div class="row" >';
+    for(var h=0; h<sizeSide; h++) { 
+     
+       var imgresult = classifyHealth(count, infectedIndex, immuneIndex, unvaccinatedIndex)
+
+       // console.log(imgresult)
+       html += '<div class="square"style="width:10px;height: 10px;">'+ '<div class=" innerSquare  '+ imgresult+'"  style="width:10px;height: 10px;"> '+"&nbsp"+'</div>' + '</div>';
+      count = count + 1;
+    } 
+      html += '</div>'; 
+  }
+  count = 1;
+
+  // console.log(html)
+
+  return html;
+}
+
+
+function findingNeighbors(myArray, i) {
+
+  var tempNeighborArray = []
+
+  var rowLimit = myArray.length-1;
+  var columnLimit = myArray[0].length-1;
+  for(var x = Math.max(0, i[0]-1); x <= Math.min(i[0]+1, rowLimit); x++) {
+    for(var y = Math.max(0, i[1]-1); y <= Math.min(i[1]+1, columnLimit); y++) {
+      if(x !== i[0] || y !== i[1]) {
+
+        // console.log("MY ARRAY : "+ myArray[x][y])
+        tempNeighborArray.push(myArray[x][y]);
+      }
+    }
+  }
+
+  return tempNeighborArray;
+
+}
+
+
+
+  
+
+
+
+function setup() {
+
+
+
+
+  percentInfected = prompt("Percentage of population introducing infection: ", "Enter a number 0 - 100")
+
+  percentInfected = percentInfected / 100.00
+  // percentInfected = .01
+  percentImmunity = prompt("Percent vaccinated: ", "Enter a number 0 - 100")
+
+  percentImmunity = percentImmunity /100.00
+
+  chanceCatch = .1
+
+
+
+
+  startingNumberSick  = Math.round(percentInfected * gridSize)
+  if(startingNumberSick == 0) {
+    startingNumberSick = 1
+  }
+
+  numberImmune = Math.round(percentImmunity * gridSize)
+  numberUnvaccinated = gridSize - numberImmune - startingNumberSick
+
+  infectedLog = startingSickIndividuals()
+  // console.log("infected: "+ infectedLog)
+  immuneLog = determineImmuneIndividuals()
+  // console.log("immune: "+ immuneLog)
+  unvaccinatedLog = determineUnvaccinatedIndividuals()
+  //
+
+  count = 1;
+  for(var i = 0; i < sizeSide; i++) {
+    reference2Darray.push(_.range(count, count+sizeSide))
+    // console.log(index)
+    count = count + sizeSide
+  }
+    // console.log(reference2Darray)
+  
+  // console.log(findingNeighbors(reference2Darray, 10, 10))
+  
+
+  var currentScene = generateScene(reference2Darray, infectedLog, immuneLog, unvaccinatedLog);
+
+  document.getElementById('gridHolder').innerHTML = currentScene;
+
+}
+
+
+function sleep(delay) {
+    var start = new Date().getTime();
+    while (new Date().getTime() < start + delay);
+}
+
+
+function changeToNothing(indexk) {
+  temp = reference2Darray[indexk[0]]
+  temp1 = temp[indexk[1]]
+  console.log(temp1)
+  remove_item(unvaccinatedLog, temp1)
+  remove_item(immuneLog, temp1)
+  remove_item(infectedLog, temp1)
+}
+
+
+function findAtRisk() {
+  var listOfExposed = [];
+  for(var p = 0; p < infectedLog.length; p++) {
+    index1 = Math.floor(infectedLog[p]/sizeSide)
+    if (index1 <0 ) {
+      index1 = 0
+    }
+    // console.log("INDEX 1: " +index1)
+    index2 = ((infectedLog[p]-1)%sizeSide)
+    // console.log("INDEX 2: "+ index2)
+    // console.log("THE reference2Darray : " + reference2Darray)
+    // reference2Darray[index1]
+
+
+      // console.log("the exposed ind: "+ +" " + )
+
+
+    temp = findingNeighbors(reference2Darray,[index1, index2])
+    // console.log(listOfExposed)
+    listOfExposed = listOfExposed.concat(temp)
+  }
+
+  return listOfExposed;
+}
+
+
+function determineIfInfected(riskList) {
+    for(var j = 0; j < riskList.length; j++) {
+      if(unvaccinatedLog.includes(riskList[j])){
+        infectedLog.push(riskList[j])
+        unvaccinatedLog = remove_item(unvaccinatedLog, riskList[j])
+      }
+    }
+}
+
+remove_item = function (arr, value) {
+    var b = '';
+    for (b in arr) {
+        if (arr[b] === value) {
+            arr.splice(b, 1);
+            break;
+        }
+    }
+    return arr;
+}
+
+
+function draw() {
+
+  // returnArrayOfNeighbors()
+
+  atRiskIndividuals = findAtRisk()
+
+  // changeToNothing([0,0])
+
+  // temp = findingNeighbors(reference2Darray,[0, index2])
+   // temp = findingNeighbors(reference2Darray, [Math.floor(0/sizeSide), (0%sizeSide)])
+      // console.log(temp)
+
+  determineIfInfected(atRiskIndividuals)
+
+    amountInfected = infectedLog.length/gridSize
+
+    document.getElementById('displayInfectedRatio').innerHTML = amountInfected * 100 + " %"
+    document.getElementById('displayVaccinationRatio').innerHTML =  percentImmunity * 100 + " % "
+    document.getElementById('displayStartingInfectionRatio').innerHTML =  percentInfected * 100 + " % "
+
+ 
+  
+  currentScene = generateScene(reference2Darray, infectedLog, immuneLog, unvaccinatedLog)
+  sleep(60);
+  document.getElementById('gridHolder').innerHTML = currentScene;
+
+
+}
+
+
+
+
+</script>
+

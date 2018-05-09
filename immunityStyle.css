@@ -1,0 +1,35 @@
+.square {
+	display: inline-block;
+
+}
+
+#gridHolder {
+ 	margin-left:20%;
+    /*background-color: white;*/
+    /*overflow:auto;*/
+    /*height: auto;*/
+}
+
+
+.row{
+	height:10px;
+}
+
+.innerSquare {
+	 top: calc(50% - 20px); left(50% - 20px);
+	 border-width: 1px;
+	 border-color: black;
+	 border-style: solid;
+}
+
+.vaccinated {
+	background-color: #d580ff;
+}
+
+.unvaccinated {
+	background-color: #99ccff;
+}
+
+.infected {
+	background-color: #ff3300;
+}
