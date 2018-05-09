@@ -1,2 +1,2 @@
-# Herd_Immunity_Model
+# A model of Herd Immunity
 ![alt text](./modelPhoto.PNG)
